@@ -10,11 +10,14 @@ endif
 CXXFLAGS+=$(OPTFLAGS)
 
 EXE_NAME=DRAMSim
+EXE_NAME2=getRowNum
 LIB_NAME=libdramsim.so
 LIB_NAME_MACOS=libdramsim.dylib
 
-SRC = $(wildcard *.cpp)
+SRC = $(filter-out getRowNum.cpp,$(wildcard *.cpp))
+SRC2 = $(filter-out TraceBasedSim.cpp,$(wildcard *.cpp))
 OBJ = $(addsuffix .o, $(basename $(SRC)))
+OBJ2 = $(addsuffix .o, $(basename $(SRC2)))
 
 #build portable objects (i.e. with -fPIC)
 POBJ = $(addsuffix .po, $(basename $(SRC)))
@@ -23,8 +26,14 @@ REBUILDABLES=$(OBJ) ${POBJ} $(EXE_NAME) $(LIB_NAME)
 
 all: ${EXE_NAME}
 
+getRow: $(EXE_NAME2)
+
 #   $@ target name, $^ target deps, $< matched pattern
 $(EXE_NAME): $(OBJ)
+	$(CXX) $(CXXFLAGS) -o $@ $^ 
+	@echo "Built $@ successfully" 
+
+$(EXE_NAME2): $(OBJ2)
 	$(CXX) $(CXXFLAGS) -o $@ $^ 
 	@echo "Built $@ successfully" 
 
