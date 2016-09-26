@@ -8,3 +8,4 @@ libdramsim.so
 ini/
 traces/
 system.ini
+*.deppo
