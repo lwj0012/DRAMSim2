@@ -307,6 +307,7 @@ void MemoryController::update()
 		//for readability's sake
 		unsigned rank = poppedBusPacket->rank;
 		unsigned bank = poppedBusPacket->bank;
+    FILE *fpc;
 		switch (poppedBusPacket->busPacketType)
 		{
 			case READ_P:
@@ -465,7 +466,7 @@ void MemoryController::update()
 				bankStates[rank][bank].stateChangeCountdown = tRP;
 				bankStates[rank][bank].nextActivate = max(currentClockCycle + tRP, bankStates[rank][bank].nextActivate);
 
-        FILE *fpc = fopen("rowbuffer_utility", "r");
+        fpc = fopen("rowbuffer_utility", "r");
         fprintf(fpc, "%u\t%u\t%u\n", rank, bank, bankActCnt[rank][bank]);
         fclose(fpc);
         bankActCnt[rank][bank] = 0;
