@@ -5,3 +5,6 @@ results/
 *.swp
 DRAMSim
 libdramsim.so
+ini/
+traces/
+system.ini
