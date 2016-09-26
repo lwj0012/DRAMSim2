@@ -71,7 +71,6 @@ using namespace DRAMSim;
 MemoryController::MemoryController(MemorySystem *parent, CSVWriter &csvOut_, ostream &dramsim_log_) :
 		dramsim_log(dramsim_log_),
 		bankStates(NUM_RANKS, vector<BankState>(NUM_BANKS, dramsim_log)),
-		bankActCnt(NUM_RANKS, vector<unsigned>(NUM_BANKS)),
 		commandQueue(bankStates, dramsim_log_),
 		poppedBusPacket(NULL),
 		csvOut(csvOut_),
@@ -117,6 +116,11 @@ MemoryController::MemoryController(MemorySystem *parent, CSVWriter &csvOut_, ost
 	{
 		refreshCountdown.push_back((int)((REFRESH_PERIOD/tCK)/NUM_RANKS)*(i+1));
 	}
+  for (size_t j=0;j<NUM_RANKS;j++) {
+    bankActCnt[j] = vector<int>(NUM_BANKS);
+    for (size_t k=0;k<NUM_BANKS;k++) {
+      bankActCnt[j][k] = -1;
+  }
 }
 
 //get a bus packet from either data or cmd bus
@@ -336,6 +340,7 @@ void MemoryController::update()
 
 				}
 
+        assert(bankActCnt[rank][bank]!=-1);
         bankActCnt[rank][bank] += 1;
 
 				for (size_t i=0;i<NUM_RANKS;i++)
@@ -387,6 +392,7 @@ void MemoryController::update()
 					bankStates[rank][bank].lastCommand = WRITE;
 				}
 
+        assert(bankActCnt[rank][bank]!=-1);
         bankActCnt[rank][bank] += 1;
 
 				//add energy to account for total
@@ -444,6 +450,7 @@ void MemoryController::update()
 				bankStates[rank][bank].nextActivate = max(currentClockCycle + tRC, bankStates[rank][bank].nextActivate);
 				bankStates[rank][bank].nextPrecharge = max(currentClockCycle + tRAS, bankStates[rank][bank].nextPrecharge);
 
+        assert(bankActCnt[rank][bank]==-1);
         bankActCnt[rank][bank] = 0;
 
 				//if we are using posted-CAS, the next column access can be sooner than normal operation
@@ -466,10 +473,11 @@ void MemoryController::update()
 				bankStates[rank][bank].stateChangeCountdown = tRP;
 				bankStates[rank][bank].nextActivate = max(currentClockCycle + tRP, bankStates[rank][bank].nextActivate);
 
+        assert(bankActCnt[rank][bank]!=-1);
         fpc = fopen("rowbuffer_utility", "r");
         fprintf(fpc, "%u\t%u\t%u\n", rank, bank, bankActCnt[rank][bank]);
         fclose(fpc);
-        bankActCnt[rank][bank] = 0;
+        bankActCnt[rank][bank] = -1;
 
 				break;
 			case REFRESH:
