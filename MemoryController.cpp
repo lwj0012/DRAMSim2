@@ -120,6 +120,7 @@ MemoryController::MemoryController(MemorySystem *parent, CSVWriter &csvOut_, ost
     bankActCnt[j] = vector<int>(NUM_BANKS);
     for (size_t k=0;k<NUM_BANKS;k++) {
       bankActCnt[j][k] = -1;
+    }
   }
 }
 
