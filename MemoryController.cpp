@@ -71,6 +71,7 @@ using namespace DRAMSim;
 MemoryController::MemoryController(MemorySystem *parent, CSVWriter &csvOut_, ostream &dramsim_log_) :
 		dramsim_log(dramsim_log_),
 		bankStates(NUM_RANKS, vector<BankState>(NUM_BANKS, dramsim_log)),
+		bankActCnt(NUM_RANKS, vector<unsigned>(NUM_BANKS)),
 		commandQueue(bankStates, dramsim_log_),
 		poppedBusPacket(NULL),
 		csvOut(csvOut_),
@@ -334,6 +335,8 @@ void MemoryController::update()
 
 				}
 
+        bankActCnt[rank][bank] += 1;
+
 				for (size_t i=0;i<NUM_RANKS;i++)
 				{
 					for (size_t j=0;j<NUM_BANKS;j++)
@@ -383,6 +386,7 @@ void MemoryController::update()
 					bankStates[rank][bank].lastCommand = WRITE;
 				}
 
+        bankActCnt[rank][bank] += 1;
 
 				//add energy to account for total
 				if (DEBUG_POWER)
@@ -439,6 +443,8 @@ void MemoryController::update()
 				bankStates[rank][bank].nextActivate = max(currentClockCycle + tRC, bankStates[rank][bank].nextActivate);
 				bankStates[rank][bank].nextPrecharge = max(currentClockCycle + tRAS, bankStates[rank][bank].nextPrecharge);
 
+        bankActCnt[rank][bank] = 0;
+
 				//if we are using posted-CAS, the next column access can be sooner than normal operation
 
 				bankStates[rank][bank].nextRead = max(currentClockCycle + (tRCD-AL), bankStates[rank][bank].nextRead);
@@ -458,6 +464,10 @@ void MemoryController::update()
 				bankStates[rank][bank].lastCommand = PRECHARGE;
 				bankStates[rank][bank].stateChangeCountdown = tRP;
 				bankStates[rank][bank].nextActivate = max(currentClockCycle + tRP, bankStates[rank][bank].nextActivate);
+
+        FILE *fp = fopen("rowbuffer_utility", "r");
+        fwrite(fp, "%u\t%u\t%u\n", rank, bank, bankActCnt[rank][bank]);
+        fclose(fp);
 
 				break;
 			case REFRESH:
