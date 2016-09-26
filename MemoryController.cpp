@@ -465,9 +465,10 @@ void MemoryController::update()
 				bankStates[rank][bank].stateChangeCountdown = tRP;
 				bankStates[rank][bank].nextActivate = max(currentClockCycle + tRP, bankStates[rank][bank].nextActivate);
 
-        FILE *fp = fopen("rowbuffer_utility", "r");
-        fwrite(fp, "%u\t%u\t%u\n", rank, bank, bankActCnt[rank][bank]);
-        fclose(fp);
+        FILE *fpc = fopen("rowbuffer_utility", "r");
+        fprintf(fpc, "%u\t%u\t%u\n", rank, bank, bankActCnt[rank][bank]);
+        fclose(fpc);
+        bankActCnt[rank][bank] = 0;
 
 				break;
 			case REFRESH:
