@@ -116,8 +116,8 @@ MemoryController::MemoryController(MemorySystem *parent, CSVWriter &csvOut_, ost
 	{
 		refreshCountdown.push_back((int)((REFRESH_PERIOD/tCK)/NUM_RANKS)*(i+1));
 	}
+  bankActCnt = vector< vector<int> >(NUM_RANKS, vector<int>(NUM_BANKS));
   for (size_t j=0;j<NUM_RANKS;j++) {
-    bankActCnt[j] = vector<int>(NUM_BANKS);
     for (size_t k=0;k<NUM_BANKS;k++) {
       bankActCnt[j][k] = -1;
     }
