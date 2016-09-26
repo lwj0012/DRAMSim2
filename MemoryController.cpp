@@ -475,7 +475,7 @@ void MemoryController::update()
 				bankStates[rank][bank].nextActivate = max(currentClockCycle + tRP, bankStates[rank][bank].nextActivate);
 
         assert(bankActCnt[rank][bank]!=-1);
-        fpc = fopen("rowbuffer_utility", "r");
+        fpc = fopen("rowbuffer_utility", "a+");
         fprintf(fpc, "%u\t%u\t%u\n", rank, bank, bankActCnt[rank][bank]);
         fclose(fpc);
         bankActCnt[rank][bank] = -1;
