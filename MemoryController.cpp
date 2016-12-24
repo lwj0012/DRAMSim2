@@ -695,11 +695,11 @@ void MemoryController::update()
 	}
 
 	//check for outstanding data to return to the CPU
-  FILE *f = fopen("returnWaiting", "a+");
-  fprintf(f, "%lu\n", returnTransaction.size());
-  fclose(f);
 	if (returnTransaction.size()>0)
 	{
+    FILE *f = fopen("returnWaiting", "a+");
+    fprintf(f, "%lu\n", returnTransaction.size());
+    fclose(f);
 		if (DEBUG_BUS)
 		{
 			PRINTN(" -- MC Issuing to CPU bus : " << *returnTransaction[0]);
