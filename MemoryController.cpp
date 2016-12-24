@@ -695,6 +695,9 @@ void MemoryController::update()
 	}
 
 	//check for outstanding data to return to the CPU
+  FILE *f = fopen("returnWaiting", "a+");
+  fprintf(f, "%lu\n", returnTransaction.size());
+  fclose(f);
 	if (returnTransaction.size()>0)
 	{
 		if (DEBUG_BUS)
@@ -717,7 +720,7 @@ void MemoryController::update()
 				unsigned chan,rank,bank,row,col;
 				addressMapping(returnTransaction[0]->address,chan,rank,bank,row,col);
                 FILE *fp = fopen("latency", "a+");
-                fprintf(fp, "%d\n", currentClockCycle-pendingReadTransactions[i]->timeAdded);
+                fprintf(fp, "%lu\n", currentClockCycle-pendingReadTransactions[i]->timeAdded);
                 fclose(fp);
 				insertHistogram(currentClockCycle-pendingReadTransactions[i]->timeAdded,rank,bank);
 				//return latency
