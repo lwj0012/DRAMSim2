@@ -375,6 +375,10 @@ bool CommandQueue::pop(BusPacket **busPacket)
 					if (closeRow && currentClockCycle >= bankStates[refreshRank][b].nextPrecharge)
 					{
 						rowAccessCounters[refreshRank][b]=0;
+            FILE *fpcd;
+            fpcd = fopen("ActPre", "a+");
+            fprintf(fpcd, "C\t%u\t%u\t%u\n", refreshRank, b, bankStates[refreshRank][b].openRowAddress);
+            fclose(fpcd);
 						*busPacket = new BusPacket(PRECHARGE, 0, 0, 0, refreshRank, b, 0, dramsim_log);
 						sendingREForPRE = true;
 					}
